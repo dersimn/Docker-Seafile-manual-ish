@@ -17,7 +17,7 @@ RUN apt-get update && \
     && \
     rm -rf /var/lib/apt/lists/* && \
     pip3 install \
-        Pillow \
+        Pillow==9.* \
         pylibmc \
         captcha \
         jinja2 \
