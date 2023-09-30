@@ -4,6 +4,7 @@ ARG DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update && \
     apt-get install -y \
+        pkg-config \
         python3 \
         python3-setuptools \
         python3-pip \
