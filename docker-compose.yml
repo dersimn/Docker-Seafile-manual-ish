@@ -16,10 +16,15 @@ services:
       - ./db-data:/var/lib/mysql
 
   app:
-    image: ubuntu:20.04
+    # build: .
+    image: seafos
     tty: true
     command: bash
-    working_dir: /seafile
+    # For external NGINX, use these:
+    # ports:
+    #   - 8000:8000
+    #   - 8082:8082
+    #   - 8080:8080
     volumes:
       - ./seafile-data:/seafile
     environment:
