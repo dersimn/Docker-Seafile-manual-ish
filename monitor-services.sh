@@ -11,18 +11,26 @@ pid_folder="/seafile/pids"
 # Check interval in seconds
 check_interval=5
 
+# Array to store the existing PIDs
+declare -a pid_array
+
 while sleep "$check_interval"; do
-    # Check all files in the folder
+    # Update the array with the current PIDs
     for pid_file in "$pid_folder"/*; do
         if [ -f "$pid_file" ]; then
             pid=$(cat "$pid_file")
-            # Check if the PID is still running
-            if ! is_pid_running $pid; then
-                echo "The PID from the file $pid_file no longer exists. Exiting the script."
-                exit 1
+            # Check if the PID is already in the array before adding it
+            if ! [[ " ${pid_array[@]} " =~ " $pid " ]]; then
+                pid_array+=("$pid")
             fi
         fi
     done
 
-    # Add optional additional commands for the loop here
+    # Check if all PIDs in the array are still running
+    for pid in "${pid_array[@]}"; do
+        if ! is_pid_running $pid; then
+            echo "The PID $pid no longer exists. Exiting the script."
+            exit 1
+        fi
+    done
 done
