@@ -19,17 +19,15 @@ while sleep "$check_interval"; do
     for pid_file in "$pid_folder"/*; do
         if [ -f "$pid_file" ]; then
             pid=$(cat "$pid_file")
-            # Check if the PID is already in the array before adding it
-            if ! [[ " ${pid_array[@]} " =~ " $pid " ]]; then
-                pid_array+=("$pid")
-            fi
+            # Update the associative array with PID as key and filename as value
+            pid_array["$pid"]=$pid_file
         fi
     done
 
     # Check if all PIDs in the array are still running
-    for pid in "${pid_array[@]}"; do
+    for pid in "${!pid_array[@]}"; do
         if ! is_pid_running $pid; then
-            echo "The PID $pid no longer exists. Exiting the script."
+            echo "The PID $pid from file ${pid_array[$pid]} no longer exists. Exiting the script."
             exit 1
         fi
     done
