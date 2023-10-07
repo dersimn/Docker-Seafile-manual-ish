@@ -40,4 +40,8 @@ RUN tar -C / -Jxpf /tmp/s6-overlay-x86_64.tar.xz
 COPY service-files /etc/s6-overlay/s6-rc.d
 
 WORKDIR /seafile
+
+COPY monitor-services.sh /monitor-services
+
+CMD ["/monitor-services"]
 ENTRYPOINT ["/init"]
