@@ -1,4 +1,4 @@
 #!/command/execlineb -P
 
-echo "Seahub Start"
+foreground { echo "Seahub Start" }
 /seafile/seafile-server-latest/seahub.sh start
