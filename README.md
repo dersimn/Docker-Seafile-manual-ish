@@ -7,6 +7,8 @@ docker build -t seafos .
 docker compose -p seafile up -d
 ```
 
+If you develop on an arm64 Mac, run the command with: `docker build -t seafos --platform linux/amd64 .` and enable Rosetta in Docker settings.
+
 Cleaning up:
 
 ```
@@ -60,9 +62,17 @@ pip3 install django==3.2.* future mysqlclient pymysql Pillow==9.* pylibmc captch
 
 ## Install
 
+Download binaries to host once for faster testing:
+
+```
+cd downloads
+wget https://s3.eu-central-1.amazonaws.com/download.seadrive.org/seafile-server_8.0.2_x86-64.tar.gz
+cd ..
+```
+
 ```
 docker exec -it seafile-app-1 bash
-wget https://s3.eu-central-1.amazonaws.com/download.seadrive.org/seafile-server_8.0.2_x86-64.tar.gz
+cp /downloads/* .
 tar xf seafile-server_8.0.2_x86-64.tar.gz
 mkdir installed
 mv seafile-server_8.0.2_x86-64.tar.gz installed
