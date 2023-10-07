@@ -8,12 +8,7 @@ RUN apt-get update && \
         python3 \
         python3-setuptools \
         python3-pip \
-        libmemcached-dev \
         libmysqlclient-dev \
-        # Extended
-        #openjdk-8-jre \
-        #libreoffice-script-provider-python \
-        #libreoffice \
     && \
     rm -rf /var/lib/apt/lists/* && \
     pip3 install \
@@ -21,17 +16,10 @@ RUN apt-get update && \
         pylibmc \
         captcha \
         jinja2 \
-        sqlalchemy \
+        sqlalchemy==1.4.* \
         django-pylibmc \
         django-simple-captcha \
-        python3-ldap \
-        future \
-        mysqlclient
-        # Extended
-        #django \
-        #pymysql \
-        #markupsafe \
-        #psd-tools \
-        #lxml
+        mysqlclient==2.0.* \
+        python3-ldap
 
 WORKDIR /seafile
