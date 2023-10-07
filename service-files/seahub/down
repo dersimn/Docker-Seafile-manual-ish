@@ -1,0 +1,4 @@
+#!/command/execlineb -P
+
+echo "Seahub STOP"
+/seafile/seafile-server-latest/seahub.sh stop

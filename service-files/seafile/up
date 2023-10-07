@@ -1,0 +1,4 @@
+#!/command/execlineb -P
+
+echo "Seafile Start"
+/seafile/seafile-server-latest/seafile.sh start
