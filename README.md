@@ -122,3 +122,25 @@ Stop, Clean, Start for Debugging:
 ```
 seafile-server-latest/seahub.sh stop; seafile-server-latest/seafile.sh stop; rm -r conf/__pycache__; rm -r /tmp/*; seafile-server-latest/seafile.sh start; seafile-server-latest/seahub.sh start
 ```
+
+## Update to 9.x
+
+Start new image with overridden entrypoint, then:
+
+```
+docker exec -it seafile-app-1 bash
+cp /downloads/seafile-server_9.0.10_x86-64.tar.gz .
+tar xf seafile-server_9.0.10_x86-64.tar.gz
+mkdir installed
+mv seafile-server_9.0.10_x86-64.tar.gz installed
+seafile-server-9.0.10/upgrade/upgrade_8.0_9.0.sh
+seafile-server-latest/seafile.sh start
+seafile-server-latest/seahub.sh start
+seafile-server-latest/seahub.sh stop
+seafile-server-latest/seafile.sh stop
+exit
+```
+
+comment-out overrides in compose file, then try to start again.
+
+Same for 10.x

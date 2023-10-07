@@ -29,8 +29,9 @@ services:
     environment:
       - TZ=Europe/Berlin
     # Uncomment these during install:
-    # tty: true
-    # entrypoint: bash
+    tty: true
+    entrypoint: bash
+    command: []
 
 volumes:
   seafile-data:
