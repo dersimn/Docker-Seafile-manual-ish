@@ -6,13 +6,30 @@ ARG DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && \
     apt-get install -y \
         xz-utils \
+        dnsutils \
+        curl \
+        ca-certificates \
+        vim \
+        htop \
+        net-tools \
+        psmisc \
+        wget \
+        git \
+        unzip \
+        tzdata \
+        fuse \
         python3 \
+        python3-dev \
         python3-setuptools \
         python3-pip \
-        libmysqlclient-dev \
+        python3-ldap \
         ldap-utils \
         libldap2-dev \
+        memcached \
+        libmemcached-dev \
         libsasl2-dev \
+        libmysqlclient-dev \
+        libmemcached11 \
     && \
     rm -rf /var/lib/apt/lists/* && \
     pip3 install \
@@ -32,10 +49,9 @@ RUN apt-get update && \
         djangosaml2==1.5.* \
         pysaml2==7.2.* \
         pycryptodome==3.16.* \
-        cffi==1.15.1 \
+        cffi==1.16.0 \
         lxml \
-        python-ldap==3.4.3 \
-        tzdata
+        python-ldap==3.4.3
 
 # s6-overlay
 ADD https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-noarch.tar.xz /tmp
