@@ -1,0 +1,140 @@
+name: Docker build and publish
+run-name: Run for ${{ github.ref_name }} (${{github.ref_type}}, triggered by ${{ github.event_name }})
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron:  '27 4 * * *'
+  push:
+    branches:
+      # Run on every branch
+      - '**'
+      # Except branches beginning with:
+      - '!fail/**'
+      - '!dead-end/**'
+      - '!trash/**'
+    tags:
+      - '**'
+
+env:
+  TARGET_IMAGE: dersimn/seafile-manual-ish
+  #TARGET_IMAGE: ${{ github.repository }}  # only if username + repository is all lowercase and the same as user + repo on Docker Hubs
+
+jobs:
+  release:
+    name: Build ${{ matrix.flavor }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          # - flavor: alpine  # Name e.g. some different base-image
+          #   # The flavor with "default-flavor: true" additionally gets the suffix-less Docker tag, e.g. "mybranch-myflavor" and additionally only "mybranch" while all other flavors only have their usual "mybranch-myotherflavor".
+          #   default-flavor: false
+          #   base-image: alpine:3  # Base image, usually first line of Dockerfile e.g.: `FROM alpine:3`
+          #   dockerfile: ./Dockerfile-alpine  # Dockerfile to use with this flavor
+          #   build-platforms: linux/386,linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64/v8,linux/ppc64le,linux/s390x
+          - flavor: v8.x
+            base-image: ubuntu:22.04
+            dockerfile: ./Dockerfile-Seafile_8.x
+            build-platforms: linux/amd64
+          - flavor: v9.x
+            base-image: ubuntu:20.04
+            dockerfile: ./Dockerfile-Seafile_9.x
+            build-platforms: linux/amd64
+          - flavor: v10.x
+            base-image: ubuntu:22.04
+            dockerfile: ./Dockerfile-Seafile_10.x
+            build-platforms: linux/amd64
+          - flavor: v11.x
+            default-flavor: true
+            base-image: ubuntu:22.04
+            dockerfile: ./Dockerfile-Seafile_11.x
+            build-platforms: linux/amd64
+    steps:
+      - name: Check if update for base image is available
+        id: check
+        uses: lucacome/docker-image-update-checker@v1
+        if: ${{ github.event_name == 'schedule' }}
+        with:
+          base-image: ${{ matrix.base-image }}
+          # Since the "check" step is executed only by schedule and the schedule
+          # always uses the default branch (which is the latest), we don't need
+          # to check multiple tags of the target images, the flavor tag (which
+          # is always the latest) is enough.
+          image: ${{ env.TARGET_IMAGE }}:${{ matrix.flavor }}
+          # Platforms containing variants are (at the moment) not supported by
+          # update checker, see
+          # <https://github.com/lucacome/docker-image-update-checker/issues/27>.
+          # Workaround: Don't use platform at all. Defaults to check only
+          # `linux/amd64`, since almost every image has at least `linux/amd64`
+          # platform and images are usually updated for all platforms at the
+          # same time, this should be fine for now.
+          #platforms: ${{ matrix.build-platforms }}
+
+      - name: Decide to continue or skip
+        id: should-build
+        # If check-step was skipped, output variable will be empty
+        run: echo continue=${{ (steps.check.outputs.needs-updating == 'true') || (github.event_name != 'schedule') }} >> $GITHUB_OUTPUT
+
+      - name: Checkout
+        uses: actions/checkout@v3
+        if: ${{ steps.should-build.outputs.continue == 'true' }}
+
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v4
+        if: ${{ steps.should-build.outputs.continue == 'true' }}
+        with:
+          images: ${{ env.TARGET_IMAGE }}
+          flavor: |
+            latest=false
+          tags: |
+            # Latest tag only for default flavor & default branch
+            type=raw,value=latest,enable=${{ format('refs/heads/{0}', github.event.repository.default_branch) == github.ref && matrix.default-flavor || 'false' }}
+            # plain flavor string on default branch
+            type=raw,value=${{ matrix.flavor }},enable={{is_default_branch}}
+            # Branch name WITHOUT suffix for default flavor
+            #type=ref,event=branch,enable=${{ matrix.default-flavor || 'false' }}
+            # Branch name WITH suffix for every branch & flavor
+            type=ref,event=branch,suffix=-${{ matrix.flavor }}
+            # Git Tag WITHOUT suffix for default flavor
+            #type=ref,event=tag,enable=${{ matrix.default-flavor || 'false' }}
+            # Git Tag WITH suffix for every tag & flavor
+            type=ref,event=tag,suffix=-${{ matrix.flavor }}
+            # Commit short SHA WITHOUT suffix for default flavor
+            #type=sha,enable=${{ matrix.default-flavor || 'false' }}
+            # Commit short SHA WITH suffix every flavor: sha-ad132f5-myflavor
+            #type=sha,suffix=-${{ matrix.flavor }}
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+        if: ${{ steps.should-build.outputs.continue == 'true' }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+        if: ${{ steps.should-build.outputs.continue == 'true' }}
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        if: ${{ steps.should-build.outputs.continue == 'true' }}
+        with:
+          username: ${{ vars.DOCKERHUB_USERNAME || github.repository_owner }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v4
+        if: ${{ steps.should-build.outputs.continue == 'true' }}
+        with:
+          push: true
+          context: .
+          file: ${{ matrix.dockerfile }}
+          platforms: ${{ matrix.build-platforms }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+
+      - name: Summary
+        run: |
+          echo "Pushed Docker Tags:" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          echo '${{ steps.meta.outputs.tags }}' >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
