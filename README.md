@@ -43,8 +43,18 @@ bind = "0.0.0.0:8000"
 
 Edit `seahub_settings.py`. This must be the domain that will be reachable from outside of any container. Seafile does redirect to this hard-coded setting! If you can't upload any files you git this setting wrong.
 
+Seafile 8.x - 10.x
+
 ```
 FILE_SERVER_ROOT = 'http://localhost:8000/seafhttp'
+```
+
+Seafile 11.x
+
+```
+FILE_SERVER_ROOT = 'http://localhost:8000/seafhttp'
+SERVICE_URL = "http://localhost:8000"
+CSRF_TRUSTED_ORIGINS = ["http://localhost:8000"]
 ```
 
 *(Optional)* If you want to enable WebDAV  

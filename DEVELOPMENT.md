@@ -1,3 +1,8 @@
+# Debug
+
+If seahub won't start, edit `gunicorn.conf.py` and set `daemon = False` to get Trace output.
+<https://forum.seafile.com/t/fresh-seahub-11-0-2-install-seahub-failed-to-start/18981>
+
 # Development
 
 Starting manually:

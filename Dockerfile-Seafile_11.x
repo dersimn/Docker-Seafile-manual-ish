@@ -34,7 +34,8 @@ RUN apt-get update && \
         pycryptodome==3.16.* \
         cffi==1.15.1 \
         lxml \
-        python-ldap==3.4.3
+        python-ldap==3.4.3 \
+        tzdata
 
 # s6-overlay
 ADD https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-noarch.tar.xz /tmp
