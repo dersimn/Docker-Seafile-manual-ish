@@ -1,6 +1,12 @@
-This package is basically a minimal Docker Image for running Seasfile manual-ish. It's purpose is to install all dependencies of Seafile (these here: []()) inside a Docker Container, so that your host system doesn't get polluted by all the manual dependencies that are needed.
+This package is basically a minimal Docker image to install Seafile manually. Its purpose is to install all the dependencies of Seafile (this one [here](https://manual.seafile.com/deploy/using_mysql/)) inside a Docker container, so that the host system is not polluted by the manually installed dependencies.
 
-You still have to manually install Seafile inside the container, which seems to be a cumbersome process, so I named this repo like that.
+Advantage over the official Seafile Docker workflow:
+- You keep a bit more control over the system instead of having to trust the automatic install/upgrade process.
+- Easier if you want to switch to containers from a previous installation on the host system.
+
+Disadvantage:
+- You still have to manually install Seafile within the container, which seems like a tedious process.  
+  ...that's why I named this repo, but I still prefer it over the official workflow.
 
 
 ## Build Docker Image
