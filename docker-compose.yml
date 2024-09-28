@@ -2,7 +2,7 @@ services:
   web:
     image: nginx
     ports:
-      - 80:80
+      - 8000:80
     volumes:
       - seafile-data:/seafile
       - nginx-logs:/logs
@@ -25,15 +25,18 @@ services:
     #   - 8080:8080
     volumes:
       - seafile-data:/seafile
-      - ./downloads:/downloads
+      - ./downloads:/downloads:ro
     environment:
       - TZ=Europe/Berlin
     # Uncomment these during install:
-    tty: true
-    entrypoint: bash
-    command: []
+    #tty: true
+    #entrypoint: bash
+    #command: []
 
 volumes:
+  # For PRODuctive environments:
+  # - mount an external folder, or
+  # - invent some kind of backup strategy for these volumes
   seafile-data:
   db-data:
   nginx-logs:
