@@ -21,9 +21,7 @@ If you develop on an arm64 Mac, run the command with: `--platform linux/amd64` a
 
 ## Install
 
-Download binaries to host once for faster testing:
-
-On host:
+On host, download binaries:
 
 ```
 cd downloads
@@ -31,7 +29,16 @@ wget https://s3.eu-central-1.amazonaws.com/download.seadrive.org/seafile-server_
 cd ..
 ```
 
-In container:
+Edit `docker-compose.yml`, enable entrypoint overrides:
+
+```yaml
+# Uncomment these during install:
+tty: true
+entrypoint: bash
+command: []
+```
+
+Start with `docker compose -p seafile up -d`, go into main container:
 
 ```
 docker exec -it seafile-app-1 bash
@@ -39,7 +46,7 @@ docker exec -it seafile-app-1 bash
 tar xf /downloads/seafile-server_8.0.2_x86-64.tar.gz
 seafile-server-8.0.2/setup-seafile-mysql.sh
 ```
-(use `db` as Database hostname)
+(use `db` as Database hostname during installation)
 
 Edit `gunicorn.conf.py`:
 
@@ -52,15 +59,15 @@ Edit `seahub_settings.py`. This must be the domain that will be reachable from o
 Seafile 8.x - 10.x
 
 ```
-FILE_SERVER_ROOT = 'http://localhost:8000/seafhttp'
+FILE_SERVER_ROOT = 'http://seafile.example.com/seafhttp'
 ```
 
 Seafile 11.x
 
 ```
-FILE_SERVER_ROOT = 'http://localhost:8000/seafhttp'
-SERVICE_URL = "http://localhost:8000"
-CSRF_TRUSTED_ORIGINS = ["http://localhost:8000"]
+FILE_SERVER_ROOT = 'http://seafile.example.com/seafhttp'
+SERVICE_URL = "http://seafile.example.com"
+CSRF_TRUSTED_ORIGINS = ["http://seafile.example.com"]
 ```
 
 *(Optional)* If you want to enable WebDAV  
