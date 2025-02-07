@@ -154,3 +154,12 @@ exit
 - `docker compose -p seafile down`
 - comment-out overrides in compose file
 - `docker compose -p seafile up -d`
+
+## Backup Volumes
+
+```
+docker volume create seafile-backup
+docker run --rm -it -v seafile-backup:/backup -v seafile_db-data:/target/db-data -v seafile_seafile-data:/target/seafile-data --workdir /target busybox sh
+
+tar cf /backup/archive.tar *
+```
