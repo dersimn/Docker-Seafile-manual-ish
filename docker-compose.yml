@@ -11,6 +11,7 @@ services:
   db:
     image: mariadb:10
     environment:
+      - MARIADB_AUTO_UPGRADE=true
       - MYSQL_ROOT_PASSWORD=root
     volumes:
       - db-data:/var/lib/mysql
